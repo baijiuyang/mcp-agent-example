@@ -4,6 +4,11 @@ import os
 from agents import Agent, Runner, gen_trace_id, trace
 from agents.mcp import MCPServer, MCPServerStdio
 
+async def ask(agent: Agent, message: str):
+    print(f"Running: {message}")
+    result = await Runner.run(starting_agent=agent, input=message)
+    print(result.final_output)
+
 
 async def run(mcp_server: MCPServer):
     agent = Agent(
@@ -12,15 +17,12 @@ async def run(mcp_server: MCPServer):
         mcp_servers=[mcp_server],
     )
 
-    # List the files it can read
-    message = "Add a user with name test_user and email test_user@example.com"
-    print(f"Running: {message}")
-    result = await Runner.run(starting_agent=agent, input=message)
-    print(result.final_output)
+    await ask(agent, "List the current users")
+    await ask(agent, "Add a user with name new_user and email new_user@example.com")
+    await ask(agent, "What users do we have?")
 
 
 async def main():
-
     async with MCPServerStdio(
         name="User management MCP Server",
         params={
